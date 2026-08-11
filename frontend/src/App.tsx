@@ -108,7 +108,7 @@ export default function App() {
       />
 
       {/* View Switcher */}
-      <main className="flex-1 overflow-y-auto bg-slate-50">
+      <main className="flex-1 overflow-y-auto bg-slate-50 min-h-0">
         {activeTab === 'sesi' && (
           <SesiSection
             selectedClass={selectedClass}

@@ -18,7 +18,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
   ];
 
   return (
-    <nav className="sticky bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-2 py-2 flex items-center justify-around z-40 shadow-[0_-4px_20px_rgba(15,23,42,0.6)]">
+    <nav className="relative bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-2 py-2 flex items-center justify-around z-40 shadow-[0_-4px_20px_rgba(15,23,42,0.6)] pb-[env(safe-area-inset-bottom)]">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;

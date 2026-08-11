@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .h-dvh {
+    height: 100dvh;
+  }
+}
+
+@supports (height: 100dvh) {
+  .h-dvh {
+    height: 100dvh;
+  }
+}
