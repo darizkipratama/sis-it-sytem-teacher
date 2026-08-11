@@ -1,0 +1,6 @@
+{
+  "name": "Portal Aktivitas Guru Mobile",
+  "description": "Aplikasi aktivitas harian guru berbasis mobile untuk kelas, jurnal, silabus, penilaian, absensi swipe & tabel, serta pengumuman wali kelas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

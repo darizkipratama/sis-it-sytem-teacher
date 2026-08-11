@@ -1,0 +1,20 @@
+{
+  "name": "sis-it-sytem-teacher",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -p \"[{name}]\" -n \"FRONTEND,BACKEND\" -c \"cyan.bold,yellow.bold\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "cd backend && (go version >/dev/null 2>&1 && go run ./cmd/api || echo '[Go Backend] Go runtime not found or backend unavailable; skipping backend server')",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "clean": "rm -rf dist frontend/dist server.js",
+    "lint": "npm --prefix frontend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.4"
+  }
+}

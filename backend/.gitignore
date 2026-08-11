@@ -1,0 +1,11 @@
+# Backend ignores
+go.sum
+bin/
+*.exe
+*.log
+*.out
+*.test
+.DS_Store
+.env
+.env.local
+node_modules/
