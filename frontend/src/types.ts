@@ -120,3 +120,16 @@ export interface AsyncMessageEvent {
   status: 'PENDING_RABBITMQ' | 'DISPATCHED_TO_GO_SERVICE' | 'SUPABASE_REALTIME_SYNCED';
   attempts: number;
 }
+
+export interface UserSession {
+  id: string;
+  nip: string;
+  name: string;
+  title: string;
+  role: string;
+  email: string;
+  avatar?: string;
+  token?: string;
+  loginTime: string;
+}
+

@@ -1,18 +1,26 @@
 import React from 'react';
-import { Bell, BookOpen, GraduationCap, ChevronDown, CheckCircle2, CloudLightning } from 'lucide-react';
-import { ClassId } from '../types';
+import { Bell, BookOpen, GraduationCap, ChevronDown, CheckCircle2, CloudLightning, LogOut } from 'lucide-react';
+import { ClassId, UserSession } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderBarProps {
   selectedClass: ClassId;
+  user?: UserSession | null;
   onClassChange: (cls: ClassId) => void;
   onOpenIntegrationDrawer: () => void;
+  onLogout?: () => void;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   selectedClass,
+  user: propUser,
   onClassChange,
-  onOpenIntegrationDrawer
+  onOpenIntegrationDrawer,
+  onLogout: propOnLogout
 }) => {
+  const auth = useAuth();
+  const currentUser = propUser || auth.user;
+  const handleLogout = propOnLogout || auth.logout;
   return (
     <header className="bg-slate-900 text-slate-100 px-4 pt-4 pb-4 shadow-xl relative border-b border-slate-800/80">
       {/* Top Identity Row */}
@@ -32,7 +40,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                 Portal Guru
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Pak Ihsan Cloud, S.Pd</p>
+            <p className="text-[11px] text-slate-400 font-medium">{currentUser?.name || 'Pak Ihsan Cloud, S.Pd'}</p>
           </div>
         </div>
 
@@ -52,6 +60,17 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             <Bell className="w-4 h-4" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-400 rounded-full"></span>
           </div>
+
+          {/* Logout Button */}
+          {handleLogout && (
+            <button
+              onClick={handleLogout}
+              className="w-9 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 hover:text-rose-300 transition cursor-pointer shadow-sm"
+              title="Keluar / Logout"
+            >
+              <LogOut className="w-4 h-4 text-rose-400" />
+            </button>
+          )}
         </div>
       </div>
 

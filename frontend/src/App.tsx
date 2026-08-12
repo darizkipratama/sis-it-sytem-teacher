@@ -10,6 +10,7 @@ import {
   getStoredJournals,
   getStoredAsyncEvents
 } from './utils/storage';
+import { useAuth } from './context/AuthContext';
 
 import { MobileContainer } from './components/MobileContainer';
 import { HeaderBar } from './components/HeaderBar';
@@ -20,8 +21,10 @@ import { PenilaianSection } from './components/PenilaianSection';
 import { PengumumanSection } from './components/PengumumanSection';
 import { JurnalSilabusSection } from './components/JurnalSilabusSection';
 import { IntegrationDrawer } from './components/IntegrationDrawer';
+import { LoginForm } from './components/LoginForm';
 
 export default function App() {
+  const { user, isAuthenticated, logout } = useAuth();
   const [selectedClass, setSelectedClass] = useState<ClassId>('10-IPA-1');
   const [activeTab, setActiveTab] = useState<NavTab>('sesi');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -49,7 +52,7 @@ export default function App() {
 
   useEffect(() => {
     refreshData();
-  }, [selectedClass]);
+  }, [selectedClass, user]);
 
   // Active Session for selected class
   const fallbackSession: ClassSession = {
@@ -100,72 +103,79 @@ export default function App() {
       asyncQueueCount={asyncEvents.length}
       onOpenIntegrationDrawer={() => setIsDrawerOpen(true)}
     >
-      {/* Top Header */}
-      <HeaderBar
-        selectedClass={selectedClass}
-        onClassChange={setSelectedClass}
-        onOpenIntegrationDrawer={() => setIsDrawerOpen(true)}
-      />
-
-      {/* View Switcher */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 min-h-0">
-        {activeTab === 'sesi' && (
-          <SesiSection
+      {!isAuthenticated ? (
+        <LoginForm />
+      ) : (
+        <>
+          {/* Top Header */}
+          <HeaderBar
             selectedClass={selectedClass}
-            session={activeSession}
-            syllabus={activeSyllabus}
-            onUpdateSession={handleUpdateSession}
-            onNavigateTab={setActiveTab}
+            onClassChange={setSelectedClass}
+            onOpenIntegrationDrawer={() => setIsDrawerOpen(true)}
           />
-        )}
 
-        {activeTab === 'absensi' && (
-          <AbsensiSection
-            students={classStudents}
-            session={activeSession}
+          {/* View Switcher */}
+          <main className="flex-1 overflow-y-auto bg-slate-50 min-h-0">
+            {activeTab === 'sesi' && (
+              <SesiSection
+                selectedClass={selectedClass}
+                session={activeSession}
+                syllabus={activeSyllabus}
+                onUpdateSession={handleUpdateSession}
+                onNavigateTab={setActiveTab}
+              />
+            )}
+
+            {activeTab === 'absensi' && (
+              <AbsensiSection
+                students={classStudents}
+                session={activeSession}
+                onRefreshData={refreshData}
+              />
+            )}
+
+            {activeTab === 'penilaian' && (
+              <PenilaianSection
+                students={classStudents}
+                assessments={assessments}
+                grades={grades}
+                selectedClass={selectedClass}
+                onRefreshData={refreshData}
+              />
+            )}
+
+            {activeTab === 'pengumuman' && (
+              <PengumumanSection
+                announcements={announcements}
+                selectedClass={selectedClass}
+                totalStudents={classStudents.length}
+                onRefreshData={refreshData}
+              />
+            )}
+
+            {activeTab === 'jurnal' && (
+              <JurnalSilabusSection
+                journals={journals}
+                session={activeSession}
+                selectedClass={selectedClass}
+                onRefreshData={refreshData}
+              />
+            )}
+          </main>
+
+          {/* Bottom Nav Bar */}
+          <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* RabbitMQ & Supabase Event Integration Drawer */}
+          <IntegrationDrawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            events={asyncEvents}
             onRefreshData={refreshData}
           />
-        )}
-
-        {activeTab === 'penilaian' && (
-          <PenilaianSection
-            students={classStudents}
-            assessments={assessments}
-            grades={grades}
-            selectedClass={selectedClass}
-            onRefreshData={refreshData}
-          />
-        )}
-
-        {activeTab === 'pengumuman' && (
-          <PengumumanSection
-            announcements={announcements}
-            selectedClass={selectedClass}
-            totalStudents={classStudents.length}
-            onRefreshData={refreshData}
-          />
-        )}
-
-        {activeTab === 'jurnal' && (
-          <JurnalSilabusSection
-            journals={journals}
-            session={activeSession}
-            selectedClass={selectedClass}
-            onRefreshData={refreshData}
-          />
-        )}
-      </main>
-
-      {/* Bottom Nav Bar */}
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {/* RabbitMQ & Supabase Event Integration Drawer */}
-      <IntegrationDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        events={asyncEvents}
-        onRefreshData={refreshData}
-      />
+        </>
+      )}
     </MobileContainer>
   );
 }
+

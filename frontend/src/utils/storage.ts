@@ -7,7 +7,8 @@ import {
   StudentGrade,
   ClassJournal,
   AttendanceRecord,
-  AsyncMessageEvent
+  AsyncMessageEvent,
+  UserSession
 } from '../types';
 import { LocalDataSource } from '../data/localDataSource';
 import { EventService } from '../services/eventService';
@@ -15,6 +16,26 @@ import { AttendanceService } from '../services/attendanceService';
 import { JournalService } from '../services/journalService';
 import { AnnouncementService } from '../services/announcementService';
 import { AssessmentService } from '../services/assessmentService';
+
+const AUTH_USER_KEY = 'ihsan_auth_user_v1';
+
+export const getStoredUser = (): UserSession | null => {
+  const data = localStorage.getItem(AUTH_USER_KEY);
+  if (!data) return null;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+};
+
+export const saveUserSession = (user: UserSession): void => {
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+};
+
+export const clearUserSession = (): void => {
+  localStorage.removeItem(AUTH_USER_KEY);
+};
 
 // Synchronous legacy getters for initial render or direct local state initializers
 export const getStoredStudents = (): Student[] => {
