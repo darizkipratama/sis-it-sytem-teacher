@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ihsancloud/aplikasi-guru-backend/internal/domain"
 	"github.com/ihsancloud/aplikasi-guru-backend/internal/queue"
-	"github.com/ihsancloud/aplikasi-guru-backend/internal/repository"
 )
 
 type SyllabusHandler struct {
@@ -15,9 +14,9 @@ type SyllabusHandler struct {
 	supabaseQ   *queue.SupabaseQueue
 }
 
-func NewSyllabusHandler(qc *queue.RabbitMQClient) *SyllabusHandler {
+func NewSyllabusHandler(repo domain.SyllabusRepository, qc *queue.RabbitMQClient) *SyllabusHandler {
 	return &SyllabusHandler{
-		repo:        repository.NewMemorySyllabusRepository(),
+		repo:        repo,
 		queueClient: qc,
 		supabaseQ:   queue.NewSupabaseQueue(),
 	}

@@ -3,22 +3,22 @@ package domain
 import "time"
 
 type ClassJournal struct {
-	ID                    string    `json:"id" db:"id"`
-	SessionID             string    `json:"sessionId" db:"session_id"`
-	ClassID               string    `json:"classId" db:"class_id"`
-	Subject               string    `json:"subject" db:"subject"`
-	Date                  string    `json:"date" db:"date"`
-	Period                string    `json:"period" db:"period"`
-	MaterialTaught        string    `json:"materialTaught" db:"material_taught"`
-	Achievements          string    `json:"achievements" db:"achievements"`
-	ObstaclesAndSolutions string    `json:"obstaclesAndSolutions" db:"obstacles_and_solutions"`
-	StudentBehaviorNotes  string    `json:"studentBehaviorNotes" db:"student_behavior_notes"`
-	IncidentReport        string    `json:"incidentReport" db:"incident_report"`
-	PresentCount          int       `json:"presentCount" db:"present_count"`
-	AbsentCount           int       `json:"absentCount" db:"absent_count"`
-	VerificationStatus    string    `json:"verificationStatus" db:"verification_status"`
-	TeacherName           string    `json:"teacherName" db:"teacher_name"`
-	CreatedAt             time.Time `json:"createdAt" db:"created_at"`
+	ID                    string    `json:"id" gorm:"column:id;primaryKey"`
+	SessionID             string    `json:"sessionId" gorm:"column:session_id"`
+	ClassID               string    `json:"classId" gorm:"column:class_id;index"`
+	Subject               string    `json:"subject" gorm:"column:subject"`
+	Date                  string    `json:"date" gorm:"column:date"`
+	Period                string    `json:"period" gorm:"column:period"`
+	MaterialTaught        string    `json:"materialTaught" gorm:"column:material_taught"`
+	Achievements          string    `json:"achievements" gorm:"column:achievements"`
+	ObstaclesAndSolutions string    `json:"obstaclesAndSolutions" gorm:"column:obstacles_and_solutions"`
+	StudentBehaviorNotes  string    `json:"studentBehaviorNotes" gorm:"column:student_behavior_notes"`
+	IncidentReport        string    `json:"incidentReport" gorm:"column:incident_report"`
+	PresentCount          int       `json:"presentCount" gorm:"column:present_count"`
+	AbsentCount           int       `json:"absentCount" gorm:"column:absent_count"`
+	VerificationStatus    string    `json:"verificationStatus" gorm:"column:verification_status"`
+	TeacherName           string    `json:"teacherName" gorm:"column:teacher_name"`
+	CreatedAt             time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 }
 
 type JournalRepository interface {

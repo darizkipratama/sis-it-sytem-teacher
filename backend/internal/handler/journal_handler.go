@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ihsancloud/aplikasi-guru-backend/internal/domain"
 	"github.com/ihsancloud/aplikasi-guru-backend/internal/queue"
-	"github.com/ihsancloud/aplikasi-guru-backend/internal/repository"
 )
 
 type JournalHandler struct {
@@ -15,9 +14,9 @@ type JournalHandler struct {
 	supabaseQ   *queue.SupabaseQueue
 }
 
-func NewJournalHandler(qc *queue.RabbitMQClient) *JournalHandler {
+func NewJournalHandler(repo domain.JournalRepository, qc *queue.RabbitMQClient) *JournalHandler {
 	return &JournalHandler{
-		repo:        repository.NewMemoryJournalRepository(),
+		repo:        repo,
 		queueClient: qc,
 		supabaseQ:   queue.NewSupabaseQueue(),
 	}

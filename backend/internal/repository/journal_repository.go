@@ -1,92 +1,53 @@
 package repository
 
 import (
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/ihsancloud/aplikasi-guru-backend/internal/domain"
+	"gorm.io/gorm"
 )
 
-type MemoryJournalRepository struct {
-	mu       sync.RWMutex
-	journals map[string]domain.ClassJournal
+type PostgresJournalRepository struct {
+	db *gorm.DB
 }
 
-func NewMemoryJournalRepository() *MemoryJournalRepository {
-	repo := &MemoryJournalRepository{
-		journals: make(map[string]domain.ClassJournal),
-	}
-
-	// Initial Seed Data
-	seed := domain.ClassJournal{
-		ID:                    "jour-101",
-		SessionID:             "ses-101",
-		ClassID:               "10-IPA-1",
-		Subject:               "Matematika Lanjut",
-		Date:                  time.Now().Format("2006-01-02"),
-		Period:                "Jam 01 - 02 (07.30 - 09.00 WIB)",
-		MaterialTaught:        "Konsep Vektor 3D, Dot Product & Sudut Orthogonal.",
-		Achievements:          "85% siswa menguasai perhitungan sudut vektor 3D.",
-		ObstaclesAndSolutions: "3 siswa butuh bimbingan sumbu Z.",
-		StudentBehaviorNotes:  "Sangat kondusif dan aktif berdiskusi.",
-		IncidentReport:        "Kelas berjalan sesuai jadwal tanpa hambatan.",
-		PresentCount:          26,
-		AbsentCount:           2,
-		VerificationStatus:    "Disahkan Headmaster",
-		TeacherName:           "Pak Ihsan Cloud, S.Pd",
-		CreatedAt:             time.Now(),
-	}
-	repo.journals[seed.ID] = seed
-
-	return repo
+func NewPostgresJournalRepository(db *gorm.DB) *PostgresJournalRepository {
+	return &PostgresJournalRepository{db: db}
 }
 
-func (r *MemoryJournalRepository) GetAllByClass(classID string) ([]domain.ClassJournal, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+func (r *PostgresJournalRepository) GetAllByClass(classID string) ([]domain.ClassJournal, error) {
+	var journals []domain.ClassJournal
+	query := r.db
+	if classID != "" {
+		query = query.Where("class_id = ?", classID)
+	}
+	err := query.Order("created_at DESC").Find(&journals).Error
+	return journals, err
+}
 
-	var result []domain.ClassJournal
-	for _, j := range r.journals {
-		if classID == "" || j.ClassID == classID {
-			result = append(result, j)
+func (r *PostgresJournalRepository) GetByID(id string) (*domain.ClassJournal, error) {
+	var journal domain.ClassJournal
+	err := r.db.First(&journal, "id = ?", id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
 		}
+		return nil, err
 	}
-	return result, nil
+	return &journal, nil
 }
 
-func (r *MemoryJournalRepository) GetByID(id string) (*domain.ClassJournal, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if j, exists := r.journals[id]; exists {
-		return &j, nil
-	}
-	return nil, nil
-}
-
-func (r *MemoryJournalRepository) Save(journal *domain.ClassJournal) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
+func (r *PostgresJournalRepository) Save(journal *domain.ClassJournal) error {
 	if journal.ID == "" {
 		journal.ID = "jour-" + uuid.New().String()[:8]
 	}
 	if journal.CreatedAt.IsZero() {
 		journal.CreatedAt = time.Now()
 	}
-
-	r.journals[journal.ID] = *journal
-	return nil
+	return r.db.Save(journal).Error
 }
 
-func (r *MemoryJournalRepository) UpdateVerificationStatus(id string, status string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if j, exists := r.journals[id]; exists {
-		j.VerificationStatus = status
-		r.journals[id] = j
-	}
-	return nil
+func (r *PostgresJournalRepository) UpdateVerificationStatus(id string, status string) error {
+	return r.db.Model(&domain.ClassJournal{}).Where("id = ?", id).Update("verification_status", status).Error
 }
