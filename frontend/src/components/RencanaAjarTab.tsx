@@ -85,6 +85,7 @@ export const RencanaAjarTab: React.FC<RencanaAjarTabProps> = ({
 
     const newPlan: Omit<SyllabusTopic, 'id'> = {
       classId: selectedClass,
+      subjectId: 'subj-1',
       subject,
       gradeLevel,
       title,

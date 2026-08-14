@@ -16,13 +16,13 @@ func NewPostgresStudentRepository(db *gorm.DB) *PostgresStudentRepository {
 
 func (r *PostgresStudentRepository) GetAllByClass(classID string) ([]domain.Student, error) {
 	var students []domain.Student
-	err := r.db.Where("class_id = ?", classID).Order("name ASC").Find(&students).Error
+	err := r.db.Preload("Class").Where("class_id = ?", classID).Order("name ASC").Find(&students).Error
 	return students, err
 }
 
 func (r *PostgresStudentRepository) GetByID(id string) (*domain.Student, error) {
 	var student domain.Student
-	err := r.db.First(&student, "id = ?", id).Error
+	err := r.db.Preload("Class").First(&student, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

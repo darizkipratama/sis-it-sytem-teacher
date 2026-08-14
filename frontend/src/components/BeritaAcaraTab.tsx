@@ -78,6 +78,8 @@ export const BeritaAcaraTab: React.FC<BeritaAcaraTabProps> = ({
     const res = await JournalService.saveJournal({
       sessionId: session.id,
       classId: selectedClass,
+      subjectId: session.subjectId || 'subj-1',
+      teacherId: 'usr-teach-1',
       subject: session.subject,
       period: session.period,
       materialTaught,
@@ -278,7 +280,7 @@ export const BeritaAcaraTab: React.FC<BeritaAcaraTabProps> = ({
                   <span className="text-[10px] font-bold text-indigo-600 uppercase">
                     BERITA ACARA #{j.id.slice(-6)}
                   </span>
-                  <h4 className="font-extrabold text-slate-900">{j.subject}</h4>
+                   <h4 className="font-extrabold text-slate-900">{j.subject}</h4>
                   <p className="text-[10px] text-slate-500">{j.date} • {j.period}</p>
                 </div>
                 <span className="flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
@@ -326,7 +328,7 @@ export const BeritaAcaraTab: React.FC<BeritaAcaraTabProps> = ({
             <div className="space-y-2 text-[11px]">
               <div className="flex justify-between border-b border-slate-100 pb-1">
                 <span className="text-slate-500">Mata Pelajaran:</span>
-                <span className="font-bold text-slate-900">{selectedJournalForPreview.subject}</span>
+                 <span className="font-bold text-slate-900">{selectedJournalForPreview.subject}</span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-1">
                 <span className="text-slate-500">Kelas & Sesi:</span>

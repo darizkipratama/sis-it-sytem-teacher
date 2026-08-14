@@ -84,15 +84,46 @@ func main() {
 	api := r.Group("/api/v1")
 	api.Use(authMiddleware.Handle())
 	{
+		subjectRepo := repository.NewPostgresSubjectRepository(gormDB)
+		classRepo := repository.NewPostgresClassRepository(gormDB)
+		assignmentRepo := repository.NewPostgresTeacherAssignmentRepository(gormDB)
 		journalRepo := repository.NewPostgresJournalRepository(gormDB)
 		syllabusRepo := repository.NewPostgresSyllabusRepository(gormDB)
 		studentRepo := repository.NewPostgresStudentRepository(gormDB)
 
+		subjectService := service.NewSubjectService(subjectRepo)
+		classService := service.NewClassService(classRepo)
+		assignmentService := service.NewTeacherAssignmentService(assignmentRepo)
 		studentService := service.NewStudentService(studentRepo)
+
+		subjectHandler := handler.NewSubjectHandler(subjectService)
+		classHandler := handler.NewClassHandler(classService)
+		assignmentHandler := handler.NewTeacherAssignmentHandler(assignmentService)
 		studentHandler := handler.NewStudentHandler(studentService)
 
 		journalHandler := handler.NewJournalHandler(journalRepo, queueClient)
 		syllabusHandler := handler.NewSyllabusHandler(syllabusRepo, queueClient)
+
+		// Subjects
+		api.POST("/subjects", subjectHandler.CreateSubject)
+		api.GET("/subjects", subjectHandler.GetSubjects)
+		api.GET("/subjects/code/:code", subjectHandler.GetSubjectByCode)
+
+		// Classes
+		api.POST("/classes", classHandler.CreateClass)
+		api.GET("/classes", classHandler.GetClasses)
+		api.GET("/classes/:id", classHandler.GetClassByID)
+		api.GET("/classes/code/:code", classHandler.GetClassByCode)
+		api.PUT("/classes/:id", classHandler.UpdateClass)
+		api.DELETE("/classes/:id", classHandler.DeleteClass)
+		api.GET("/classes/teacher/:teacherId", classHandler.GetClassesByTeacher)
+
+		// Teacher Assignments
+		api.POST("/assignments", assignmentHandler.UpsertAssignment)
+		api.GET("/assignments/current", assignmentHandler.GetCurrentAssignment)
+		api.GET("/assignments/teacher/:teacherId", assignmentHandler.GetAssignmentsByTeacher)
+		api.GET("/assignments/class/:classId", assignmentHandler.GetAssignmentsByClass)
+		api.DELETE("/assignments/:id", assignmentHandler.DeleteAssignment)
 
 		// Berita Acara & Jurnal Mengajar
 		api.GET("/journals", journalHandler.GetJournals)

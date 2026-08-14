@@ -18,7 +18,7 @@ func NewPostgresJournalRepository(db *gorm.DB) *PostgresJournalRepository {
 
 func (r *PostgresJournalRepository) GetAllByClass(classID string) ([]domain.ClassJournal, error) {
 	var journals []domain.ClassJournal
-	query := r.db
+	query := r.db.Preload("Class").Preload("Subject").Preload("Teacher")
 	if classID != "" {
 		query = query.Where("class_id = ?", classID)
 	}
@@ -28,7 +28,7 @@ func (r *PostgresJournalRepository) GetAllByClass(classID string) ([]domain.Clas
 
 func (r *PostgresJournalRepository) GetByID(id string) (*domain.ClassJournal, error) {
 	var journal domain.ClassJournal
-	err := r.db.First(&journal, "id = ?", id).Error
+	err := r.db.Preload("Class").Preload("Subject").Preload("Teacher").First(&journal, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

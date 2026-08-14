@@ -18,7 +18,7 @@ func NewPostgresSyllabusRepository(db *gorm.DB) *PostgresSyllabusRepository {
 
 func (r *PostgresSyllabusRepository) GetAllByClass(classID string) ([]domain.SyllabusTopic, error) {
 	var syllabusList []domain.SyllabusTopic
-	query := r.db
+	query := r.db.Preload("Class").Preload("Subject")
 	if classID != "" {
 		query = query.Where("class_id = ?", classID)
 	}
@@ -28,7 +28,7 @@ func (r *PostgresSyllabusRepository) GetAllByClass(classID string) ([]domain.Syl
 
 func (r *PostgresSyllabusRepository) GetByID(id string) (*domain.SyllabusTopic, error) {
 	var syllabus domain.SyllabusTopic
-	err := r.db.First(&syllabus, "id = ?", id).Error
+	err := r.db.Preload("Class").Preload("Subject").First(&syllabus, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

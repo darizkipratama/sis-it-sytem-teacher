@@ -21,7 +21,7 @@ export class JournalService extends BaseService {
    * Save or update a class journal / Berita Acara Pengajaran
    */
   public static async saveJournal(
-    journalData: Partial<ClassJournal> & { classId: ClassId; subject: string; sessionId: string }
+    journalData: Partial<ClassJournal> & { classId: ClassId; subjectId: string; sessionId: string }
   ): Promise<ServiceResponse<ClassJournal>> {
     try {
       const journals = await LocalDataSource.getJournals();
@@ -36,7 +36,10 @@ export class JournalService extends BaseService {
         id: journalId,
         sessionId: journalData.sessionId,
         classId: journalData.classId,
-        subject: journalData.subject,
+        subjectId: journalData.subjectId,
+        subject: journalData.subject || 'Matematika Lanjut',
+        teacherId: journalData.teacherId || 'usr-teach-1',
+        teacherName: journalData.teacherName || 'Pak Ihsan Cloud, S.Pd',
         date: journalData.date || now.split('T')[0],
         period: journalData.period || 'Jam 01 - 02',
         materialTaught: journalData.materialTaught || '',
@@ -47,7 +50,6 @@ export class JournalService extends BaseService {
         presentCount: journalData.presentCount || 0,
         absentCount: journalData.absentCount || 0,
         verificationStatus: journalData.verificationStatus || 'Disahkan Headmaster',
-        teacherName: journalData.teacherName || 'Pak Ihsan Cloud, S.Pd',
         createdAt: journalData.createdAt || now
       };
 

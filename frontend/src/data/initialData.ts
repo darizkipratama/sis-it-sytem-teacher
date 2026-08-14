@@ -1,4 +1,22 @@
-import { Student, ClassSession, SyllabusTopic, Announcement, AssessmentItem, StudentGrade, ClassJournal } from '../types';
+import { Student, ClassSession, SyllabusTopic, Announcement, AssessmentItem, StudentGrade, ClassJournal, Subject, Class, TeacherAssignment } from '../types';
+
+export const INITIAL_SUBJECTS: Subject[] = [
+  { id: 'subj-1', code: 'MTK-LANJUT', name: 'Matematika Lanjut' },
+  { id: 'subj-2', code: 'FISIKA', name: 'Fisika' },
+  { id: 'subj-3', code: 'BINDO', name: 'Bahasa Indonesia' }
+];
+
+export const INITIAL_CLASSES: Class[] = [
+  { id: 'cls-1', code: '10-IPA-1', name: 'Kelas 10 IPA 1', gradeLevel: 'Kelas X', teacherId: 'usr-teach-1', academicYear: '2024/2025' },
+  { id: 'cls-2', code: '10-IPA-2', name: 'Kelas 10 IPA 2', gradeLevel: 'Kelas X', teacherId: 'usr-teach-1', academicYear: '2024/2025' },
+  { id: 'cls-3', code: '11-MIPA-3', name: 'Kelas 11 MIPA 3', gradeLevel: 'Kelas XI', teacherId: 'usr-teach-1', academicYear: '2024/2025' }
+];
+
+export const INITIAL_ASSIGNMENTS: TeacherAssignment[] = [
+  { id: 'asgn-1', teacherId: 'usr-teach-1', classId: 'cls-1', subjectId: 'subj-1', dayOfWeek: 'Monday', startTime: '07:30', endTime: '09:00' },
+  { id: 'asgn-2', teacherId: 'usr-teach-1', classId: 'cls-1', subjectId: 'subj-2', dayOfWeek: 'Tuesday', startTime: '09:30', endTime: '11:00' },
+  { id: 'asgn-3', teacherId: 'usr-teach-1', classId: 'cls-2', subjectId: 'subj-1', dayOfWeek: 'Wednesday', startTime: '07:30', endTime: '09:00' }
+];
 
 export const INITIAL_STUDENTS: Student[] = [
   {
@@ -7,7 +25,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Ahmad Raihan Pratama',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 98,
     parentName: 'Bpk. Hendra Pratama',
     parentPhone: '081234567801'
@@ -18,7 +36,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Aisyah Anindya Putri',
     gender: 'P',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 100,
     parentName: 'Ibu Ratna Juwita',
     parentPhone: '081234567802'
@@ -29,7 +47,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Bagus Dewantara',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 92,
     parentName: 'Bpk. Bambang Dewa',
     parentPhone: '081234567803'
@@ -40,7 +58,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Citra Kirana Maya',
     gender: 'P',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 96,
     parentName: 'Ibu Maya Lestari',
     parentPhone: '081234567804'
@@ -51,7 +69,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Daffa Rizky Ramadhan',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 95,
     parentName: 'Bpk. Syarif Ramadhan',
     parentPhone: '081234567805'
@@ -62,7 +80,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Fadhil Ihsan Naufal',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 97,
     parentName: 'Bpk. Naufal Ihsan',
     parentPhone: '081234567806'
@@ -73,7 +91,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Farah Salsabila',
     gender: 'P',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 99,
     parentName: 'Ibu Eni Salsabila',
     parentPhone: '081234567807'
@@ -84,7 +102,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Gilang Ramadhan',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 88,
     parentName: 'Bpk. Yudi Ramadhan',
     parentPhone: '081234567808'
@@ -95,7 +113,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Hana Khairunnisa',
     gender: 'P',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 100,
     parentName: 'Ibu Nur Khairunnisa',
     parentPhone: '081234567809'
@@ -106,7 +124,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Ibrahim Al-Fatih',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 94,
     parentName: 'Bpk. Usman Al-Fatih',
     parentPhone: '081234567810'
@@ -117,7 +135,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Jasmine Zahra',
     gender: 'P',
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 96,
     parentName: 'Ibu Zahra Hasan',
     parentPhone: '081234567811'
@@ -128,7 +146,7 @@ export const INITIAL_STUDENTS: Student[] = [
     name: 'Kevin Maulana',
     gender: 'L',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     attendanceHistoryRate: 91,
     parentName: 'Bpk. Agus Maulana',
     parentPhone: '081234567812'
@@ -138,8 +156,9 @@ export const INITIAL_STUDENTS: Student[] = [
 export const INITIAL_SESSIONS: ClassSession[] = [
   {
     id: 'ses-101',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     topic: 'Vektor & Persamaan Matriks 3D',
     room: 'Lab Komputer 02 / Ruang 101',
     period: 'Jam 01 - 02 (07:30 - 09:00 WIB)',
@@ -148,8 +167,9 @@ export const INITIAL_SESSIONS: ClassSession[] = [
   },
   {
     id: 'ses-102',
-    classId: '10-IPA-2',
+    classId: 'cls-2',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     topic: 'Fungsi Trigonometri Lanjutan',
     room: 'Ruang Kelas 10-B',
     period: 'Jam 05 - 06 (10:45 - 12:15 WIB)',
@@ -158,8 +178,9 @@ export const INITIAL_SESSIONS: ClassSession[] = [
   },
   {
     id: 'ses-103',
-    classId: '11-MIPA-3',
+    classId: 'cls-3',
     subject: 'Fisika Terapan',
+    subjectId: 'subj-2',
     topic: 'Termodinamika & Hukum Joule',
     room: 'Lab Fisika Utama',
     period: 'Jam 07 - 08 (13:00 - 14:30 WIB)',
@@ -171,6 +192,8 @@ export const INITIAL_SESSIONS: ClassSession[] = [
 export const INITIAL_SYLLABUS: SyllabusTopic[] = [
   {
     id: 'syl-01',
+    classId: 'cls-1',
+    subjectId: 'subj-1',
     subject: 'Matematika Lanjut',
     gradeLevel: 'Kelas X Semester 2',
     title: 'Bab 4: Vektor di R2 dan R3',
@@ -197,7 +220,7 @@ export const INITIAL_SYLLABUS: SyllabusTopic[] = [
 export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
   {
     id: 'ann-1',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     title: 'Persiapan Penilaian Tengah Semester (PTS) Genap',
     content: 'Diberitahukan kepada seluruh Orang Tua/Wali Siswa Kelas 10 IPA 1, pelaksanaan PTS Genap akan dimulai tanggal 15 Mei 2026. Mohon bimbingan belajar di rumah disesuaikan dengan kisi-kisi pada aplikasi.',
     category: 'Penting/Urgent',
@@ -209,7 +232,7 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
   },
   {
     id: 'ann-2',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     title: 'Pertemuan Rutin Paguyuban Orang Tua & Diskusi Proyek Siswa',
     content: 'Undangan silaturahmi & pemaparan hasil Proyek Profil Pelajar Pancasila siswa 10 IPA 1 yang akan diselenggarakan hari Sabtu ini jam 09.00 di Aula Sekolah Ihsan Cloud.',
     category: 'Kegiatan Sekolah',
@@ -226,8 +249,9 @@ export const INITIAL_ASSESSMENTS: AssessmentItem[] = [
     id: 'ass-1',
     title: 'Evaluasi Harian 1 - Vektor Dasar',
     type: 'Evaluasi Harian',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     date: '2026-07-15',
     maxScore: 100,
     weight: 20
@@ -236,8 +260,9 @@ export const INITIAL_ASSESSMENTS: AssessmentItem[] = [
     id: 'ass-2',
     title: 'Kuis Singkat: Dot Product',
     type: 'Kuis',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     date: '2026-07-18',
     maxScore: 100,
     weight: 10
@@ -246,8 +271,9 @@ export const INITIAL_ASSESSMENTS: AssessmentItem[] = [
     id: 'ass-3',
     title: 'Proyek Kelompok: Model Visual 3D Vektor',
     type: 'Proyek',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     date: '2026-07-21',
     maxScore: 100,
     weight: 30
@@ -256,8 +282,9 @@ export const INITIAL_ASSESSMENTS: AssessmentItem[] = [
     id: 'ass-4',
     title: 'Ujian Tengah Semester (PTS)',
     type: 'Ujian',
-    classId: '10-IPA-1',
+    classId: 'cls-1',
     subject: 'Matematika Lanjut',
+    subjectId: 'subj-1',
     date: '2026-07-28',
     maxScore: 100,
     weight: 40
@@ -283,7 +310,9 @@ export const INITIAL_GRADES: StudentGrade[] = [
 export const INITIAL_JOURNAL: ClassJournal = {
   id: 'jour-1',
   sessionId: 'ses-101',
-  classId: '10-IPA-1',
+  classId: 'cls-1',
+  subjectId: 'subj-1',
+  teacherId: 'usr-teach-1',
   subject: 'Matematika Lanjut',
   date: new Date().toISOString().split('T')[0],
   materialTaught: 'Menyelesaikan konsep perkalian titik (dot product) dan pengenalan vektor posisi 3D.',

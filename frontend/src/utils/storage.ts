@@ -107,7 +107,7 @@ export const saveAttendanceRecords = (records: AttendanceRecord[]) => {
 };
 
 export const saveJournalEntry = (journal: ClassJournal) => {
-  JournalService.saveJournal(journal);
+  JournalService.saveJournal(journal as any);
 };
 
 export const addAnnouncement = (newAnn: Announcement) => {

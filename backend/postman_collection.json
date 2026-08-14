@@ -1,0 +1,653 @@
+{
+  "info": {
+    "_postman_id": "aplikasi-guru-backend-api",
+    "name": "Aplikasi Guru Backend API",
+    "description": "Postman collection for IhsanCloud Go Backend — Teacher IT System. Covers auth, subjects, classes, teacher assignments, journals, syllabus, and students.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    },
+    {
+      "key": "teacher_id",
+      "value": "usr-teach-1"
+    },
+    {
+      "key": "headmaster_id",
+      "value": "usr-head-1"
+    },
+    {
+      "key": "class_id",
+      "value": "cls-1"
+    },
+    {
+      "key": "subject_id",
+      "value": "subj-1"
+    },
+    {
+      "key": "student_id",
+      "value": "s1"
+    },
+    {
+      "key": "journal_id",
+      "value": "jour-101"
+    },
+    {
+      "key": "syllabus_id",
+      "value": "syl-1"
+    },
+    {
+      "key": "assignment_id",
+      "value": "asgn-1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nipOrEmail\": \"ihsan.cloud@sekolanihsan.sch.id\",\n  \"password\": \"guru123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Headmaster)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nipOrEmail\": \"kepsek@sekolanihsan.sch.id\",\n  \"password\": \"guru123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"MTK-LANJUT\",\n  \"name\": \"Matematika Lanjut\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/subjects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "subjects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subjects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "subjects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Subject by Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subjects/code/MTK-LANJUT",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "subjects", "code", "MTK-LANJUT"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Classes",
+      "item": [
+        {
+          "name": "Create Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"10-IPA-1\",\n  \"name\": \"Kelas 10 IPA 1\",\n  \"gradeLevel\": \"Kelas X\",\n  \"teacherId\": \"{{teacher_id}}\",\n  \"academicYear\": \"2024/2025\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Class by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes/{{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes", "{{class_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Class by Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes/code/10-IPA-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes", "code", "10-IPA-1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Class",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"10-IPA-1\",\n  \"name\": \"Kelas 10 IPA 1 (Updated)\",\n  \"gradeLevel\": \"Kelas X\",\n  \"teacherId\": \"{{teacher_id}}\",\n  \"academicYear\": \"2024/2025\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes/{{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes", "{{class_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes/{{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes", "{{class_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Classes by Teacher",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classes/teacher/{{teacher_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classes", "teacher", "{{teacher_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Teacher Assignments",
+      "item": [
+        {
+          "name": "Upsert Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacherId\": \"{{teacher_id}}\",\n  \"classId\": \"{{class_id}}\",\n  \"subjectId\": \"{{subject_id}}\",\n  \"dayOfWeek\": \"Monday\",\n  \"startTime\": \"07:30\",\n  \"endTime\": \"09:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "assignments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Assignment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/current?teacherId={{teacher_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "assignments", "current"],
+              "query": [
+                {
+                  "key": "teacherId",
+                  "value": "{{teacher_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assignments by Teacher",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/teacher/{{teacher_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "assignments", "teacher", "{{teacher_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assignments by Class",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/class/{{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "assignments", "class", "{{class_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "assignments", "{{assignment_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Journals",
+      "item": [
+        {
+          "name": "Get Journals (by Class)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/journals?classId={{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "journals"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "{{class_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Journal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"ses-101\",\n  \"classId\": \"{{class_id}}\",\n  \"subjectId\": \"{{subject_id}}\",\n  \"teacherId\": \"{{teacher_id}}\",\n  \"teacherName\": \"Pak Ihsan Cloud, S.Pd\",\n  \"date\": \"2026-08-14\",\n  \"period\": \"Jam 01 - 02 (07.30 - 09.00 WIB)\",\n  \"materialTaught\": \"Konsep Vektor 3D, Dot Product & Sudut Orthogonal.\",\n  \"achievements\": \"85% siswa menguasai perhitungan sudut vektor 3D.\",\n  \"obstaclesAndSolutions\": \"3 siswa butuh bimbingan sumbu Z.\",\n  \"studentBehaviorNotes\": \"Sangat kondusif dan aktif berdiskusi.\",\n  \"incidentReport\": \"Kelas berjalan sesuai jadwal tanpa hambatan.\",\n  \"presentCount\": 26,\n  \"absentCount\": 2,\n  \"verificationStatus\": \"Disahkan Headmaster\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/journals",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "journals"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Journal",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Disahkan Headmaster\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/journals/{{journal_id}}/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "journals", "{{journal_id}}", "verify"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Syllabus",
+      "item": [
+        {
+          "name": "Get Syllabus (by Class)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/syllabus?classId={{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "syllabus"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "{{class_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Syllabus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classId\": \"{{class_id}}\",\n  \"subjectId\": \"{{subject_id}}\",\n  \"gradeLevel\": \"Kelas X Semester 2\",\n  \"title\": \"Vektor & Operasi Aljabar 3D\",\n  \"chapter\": \"Bab 4\",\n  \"competencyTarget\": \"Siswa mampu menganalisis proyeksi vektor dan sudut orthogonal.\",\n  \"learningObjectives\": [\"Memahami penjumlahan vektor\", \"Perhitungan dot product 3D\"],\n  \"subTopics\": [\n    { \"id\": \"st-1\", \"title\": \"Definisi Vektor\", \"completed\": true, \"recommendedDuration\": \"45 Menit\" },\n    { \"id\": \"st-2\", \"title\": \"Operasi Vektor & Dot Product\", \"completed\": false, \"recommendedDuration\": \"45 Menit\" }\n  ],\n  \"referenceMaterials\": [\"Buku Panduan Guru Kurikulum Merdeka\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/syllabus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "syllabus"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Subtopic",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/syllabus/{{syllabus_id}}/subtopics/st-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "syllabus", "{{syllabus_id}}", "subtopics", "st-1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Get Students (by Class)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/students?classId={{class_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "students"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "{{class_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/students/{{student_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "students", "{{student_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

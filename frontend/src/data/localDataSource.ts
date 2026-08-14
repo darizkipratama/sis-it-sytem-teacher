@@ -7,7 +7,10 @@ import {
   StudentGrade,
   ClassJournal,
   AttendanceRecord,
-  AsyncMessageEvent
+  AsyncMessageEvent,
+  Subject,
+  Class,
+  TeacherAssignment
 } from '../types';
 import {
   INITIAL_STUDENTS,
@@ -16,7 +19,10 @@ import {
   INITIAL_ANNOUNCEMENTS,
   INITIAL_ASSESSMENTS,
   INITIAL_GRADES,
-  INITIAL_JOURNAL
+  INITIAL_JOURNAL,
+  INITIAL_SUBJECTS,
+  INITIAL_CLASSES,
+  INITIAL_ASSIGNMENTS
 } from './initialData';
 
 const STORAGE_KEYS = {
@@ -28,13 +34,12 @@ const STORAGE_KEYS = {
   GRADES: 'ihsan_grades_v2',
   JOURNALS: 'ihsan_journals_v2',
   ATTENDANCE: 'ihsan_attendance_v2',
-  ASYNC_EVENTS: 'ihsan_async_events_v2'
+  ASYNC_EVENTS: 'ihsan_async_events_v2',
+  SUBJECTS: 'ihsan_subjects_v2',
+  CLASSES: 'ihsan_classes_v2',
+  ASSIGNMENTS: 'ihsan_assignments_v2'
 };
 
-/**
- * Data Access Layer (Repository Pattern)
- * Encapsulates raw data operations. Ready to be replaced or plugged into Axios/Fetch/Supabase backend client.
- */
 export class LocalDataSource {
   // Students
   public static async getStudents(): Promise<Student[]> {
@@ -124,5 +129,73 @@ export class LocalDataSource {
 
   public static async saveAsyncEvents(events: AsyncMessageEvent[]): Promise<void> {
     localStorage.setItem(STORAGE_KEYS.ASYNC_EVENTS, JSON.stringify(events));
+  }
+
+  // Subjects
+  public static async getSubjects(): Promise<Subject[]> {
+    const data = localStorage.getItem(STORAGE_KEYS.SUBJECTS);
+    return data ? JSON.parse(data) : INITIAL_SUBJECTS;
+  }
+
+  public static async saveSubjects(subjects: Subject[]): Promise<void> {
+    localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+  }
+
+  // Classes
+  public static async getClasses(): Promise<Class[]> {
+    const data = localStorage.getItem(STORAGE_KEYS.CLASSES);
+    return data ? JSON.parse(data) : INITIAL_CLASSES;
+  }
+
+  public static async saveClasses(classes: Class[]): Promise<void> {
+    localStorage.setItem(STORAGE_KEYS.CLASSES, JSON.stringify(classes));
+  }
+
+  public static async getClassById(id: string): Promise<Class | undefined> {
+    const classes = await this.getClasses();
+    return classes.find(c => c.id === id);
+  }
+
+  public static async getClassByCode(code: string): Promise<Class | undefined> {
+    const classes = await this.getClasses();
+    return classes.find(c => c.code === code);
+  }
+
+  public static async getClassesByTeacher(teacherId: string): Promise<Class[]> {
+    const classes = await this.getClasses();
+    return classes.filter(c => c.teacherId === teacherId);
+  }
+
+  // Teacher Assignments
+  public static async getAssignments(): Promise<TeacherAssignment[]> {
+    const data = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
+    return data ? JSON.parse(data) : INITIAL_ASSIGNMENTS;
+  }
+
+  public static async saveAssignments(assignments: TeacherAssignment[]): Promise<void> {
+    localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(assignments));
+  }
+
+  public static async getAssignmentsByTeacher(teacherId: string): Promise<TeacherAssignment[]> {
+    const assignments = await this.getAssignments();
+    return assignments.filter(a => a.teacherId === teacherId);
+  }
+
+  public static async getAssignmentsByClass(classId: string): Promise<TeacherAssignment[]> {
+    const assignments = await this.getAssignments();
+    return assignments.filter(a => a.classId === classId);
+  }
+
+  public static async getCurrentAssignment(teacherId: string): Promise<TeacherAssignment | undefined> {
+    const assignments = await this.getAssignmentsByTeacher(teacherId);
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sunday, 1=Monday, ...
+    const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+
+    return assignments.find(a => {
+      const assignmentDay = new Date(a.dayOfWeek + ', 2000-01-01').getDay();
+      if (assignmentDay !== dayOfWeek) return false;
+      return currentTime >= a.startTime && currentTime < a.endTime;
+    });
   }
 }

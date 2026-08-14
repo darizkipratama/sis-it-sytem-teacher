@@ -11,6 +11,7 @@ type User struct {
 	Email        string    `json:"email" gorm:"column:email;uniqueIndex;not null"`
 	PasswordHash string    `json:"-" gorm:"column:password_hash;not null"`
 	Avatar       string    `json:"avatar,omitempty" gorm:"column:avatar"`
+	Classes      []Class   `json:"classes,omitempty" gorm:"foreignKey:TeacherID"`
 	CreatedAt    time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt    time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }

@@ -73,6 +73,7 @@ export default function App() {
   const fallbackSyllabus = {
     id: 'syl-fallback',
     classId: selectedClass,
+    subjectId: 'subj-1',
     subject: 'Matematika Lanjut',
     gradeLevel: 'Kelas X Semester 2',
     title: 'Konsep Vektor & Operasi Matriks 3D',

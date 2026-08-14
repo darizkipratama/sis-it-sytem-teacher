@@ -1,6 +1,35 @@
-export type ClassId = '10-IPA-1' | '10-IPA-2' | '11-MIPA-3';
+export type ClassId = string;
+export type SubjectId = string;
 
 export type AttendanceStatus = 'Hadir' | 'Sakit' | 'Izin' | 'Alpa' | 'Terlambat';
+
+export interface Subject {
+  id: string;
+  code: string;
+  name: string;
+  createdAt?: string;
+}
+
+export interface Class {
+  id: string;
+  code: string;
+  name: string;
+  gradeLevel: string;
+  teacherId: string;
+  academicYear: string;
+  createdAt?: string;
+}
+
+export interface TeacherAssignment {
+  id: string;
+  teacherId: string;
+  classId: ClassId;
+  subjectId: SubjectId;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  createdAt?: string;
+}
 
 export interface Student {
   id: string;
@@ -9,6 +38,7 @@ export interface Student {
   gender: 'L' | 'P';
   avatar: string;
   classId: ClassId;
+  class?: Class;
   attendanceHistoryRate: number; // percentage
   parentName: string;
   parentPhone: string;
@@ -22,6 +52,7 @@ export interface AssessmentItem {
   type: GradeType;
   classId: ClassId;
   subject: string;
+  subjectId?: SubjectId;
   date: string;
   maxScore: number;
   weight: number; // percentage in final report
@@ -38,6 +69,7 @@ export interface ClassSession {
   id: string;
   classId: ClassId;
   subject: string;
+  subjectId?: SubjectId;
   topic: string;
   room: string;
   period: string; // e.g. "Jam 03 - 04 (09:00 - 10:30)"
@@ -51,7 +83,12 @@ export interface ClassJournal {
   id: string;
   sessionId: string;
   classId: ClassId;
+  class?: Class;
+  subjectId: SubjectId;
   subject: string;
+  teacherId: string;
+  teacher?: UserSession;
+  teacherName: string;
   date: string;
   period?: string;
   materialTaught: string;
@@ -63,13 +100,14 @@ export interface ClassJournal {
   absentCount?: number;
   verificationStatus?: 'Draft' | 'Disahkan Headmaster' | 'Selesai';
   photoUrl?: string;
-  teacherName: string;
   createdAt?: string;
 }
 
 export interface SyllabusTopic {
   id: string;
   classId?: ClassId;
+  class?: Class;
+  subjectId: SubjectId;
   subject: string;
   gradeLevel: string;
   title: string;
@@ -132,4 +170,3 @@ export interface UserSession {
   token?: string;
   loginTime: string;
 }
-
