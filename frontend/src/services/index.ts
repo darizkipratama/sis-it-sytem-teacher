@@ -1,4 +1,6 @@
 export * from './baseService';
+export * from './apiClient';
+export * from './authService';
 export * from './eventService';
 export * from './journalService';
 export * from './syllabusService';

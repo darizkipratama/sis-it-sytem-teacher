@@ -37,3 +37,26 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"data":    resp,
 	})
 }
+
+func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	user, err := h.authService.GetCurrentUser(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    user,
+	})
+}

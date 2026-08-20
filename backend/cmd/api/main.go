@@ -104,6 +104,9 @@ func main() {
 		journalHandler := handler.NewJournalHandler(journalRepo, queueClient)
 		syllabusHandler := handler.NewSyllabusHandler(syllabusRepo, queueClient)
 
+		// Auth
+		api.GET("/auth/me", authHandler.GetCurrentUser)
+
 		// Subjects
 		api.POST("/subjects", subjectHandler.CreateSubject)
 		api.GET("/subjects", subjectHandler.GetSubjects)

@@ -18,6 +18,7 @@ import { AnnouncementService } from '../services/announcementService';
 import { AssessmentService } from '../services/assessmentService';
 
 const AUTH_USER_KEY = 'ihsan_auth_user_v1';
+const AUTH_TOKEN_KEY = 'ihsan_auth_token_v1';
 
 export const getStoredUser = (): UserSession | null => {
   const data = localStorage.getItem(AUTH_USER_KEY);
@@ -31,10 +32,18 @@ export const getStoredUser = (): UserSession | null => {
 
 export const saveUserSession = (user: UserSession): void => {
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  if (user.token) {
+    localStorage.setItem(AUTH_TOKEN_KEY, user.token);
+  }
 };
 
 export const clearUserSession = (): void => {
   localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+};
+
+export const getStoredToken = (): string | null => {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
 };
 
 // Synchronous legacy getters for initial render or direct local state initializers

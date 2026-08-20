@@ -46,6 +46,17 @@ func (s *AuthService) Login(nipOrEmail, password string) (*LoginResponse, error)
 	return &LoginResponse{Token: token, User: user}, nil
 }
 
+func (s *AuthService) GetCurrentUser(userID string) (*domain.User, error) {
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+	if user == nil {
+		return nil, fmt.Errorf("user not found")
+	}
+	return user, nil
+}
+
 func (s *AuthService) generateJWT(user *domain.User) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":   user.ID,

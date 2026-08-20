@@ -8,12 +8,16 @@ export interface ServiceResponse<T> {
   error?: string;
 }
 
+import { ApiClient } from './apiClient';
+
 export class BaseService {
+  protected static apiClient = ApiClient;
+
   protected static createSuccess<T>(data: T, message?: string): ServiceResponse<T> {
     return {
       success: true,
       data,
-      message
+      message,
     };
   }
 
@@ -21,7 +25,7 @@ export class BaseService {
     return {
       success: false,
       message,
-      error
+      error,
     };
   }
 }

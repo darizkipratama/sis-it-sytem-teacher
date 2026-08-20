@@ -12,15 +12,14 @@ import {
   Sparkles,
   Loader2
 } from 'lucide-react';
-import { UserSession } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 interface LoginFormProps {
-  onLoginSuccess?: (user: UserSession) => void;
+  onLoginSuccess?: (user: any) => void;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const { login } = useAuth();
+  const { login, isLoading: authLoading } = useAuth();
   const [nipOrEmail, setNipOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,20 +28,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
 
-  // Preset demo user for quick access
-  const DEFAULT_TEACHER: UserSession = {
-    id: 'usr-101',
-    nip: '198804122015031002',
-    name: 'Pak Ihsan Cloud, S.Pd',
-    title: 'Guru Matematika Lanjut & Fisika',
-    role: 'Wali Kelas 10 IPA 1',
-    email: 'ihsan.cloud@sekolanihsan.sch.id',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    token: 'jwt_mock_token_ihsan_cloud_2026',
-    loginTime: new Date().toISOString()
-  };
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setInfoMsg('');
@@ -64,37 +50,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
     setIsLoading(true);
 
-    // Simulate authenticating against backend / Supabase
-    setTimeout(() => {
-      setIsLoading(false);
-      const user: UserSession = {
-        ...DEFAULT_TEACHER,
-        nip: nipOrEmail.includes('@') ? DEFAULT_TEACHER.nip : nipOrEmail,
-        email: nipOrEmail.includes('@') ? nipOrEmail : DEFAULT_TEACHER.email,
-        loginTime: new Date().toISOString()
-      };
+    const success = await login(nipOrEmail, password);
+    setIsLoading(false);
 
-      login(user);
-      if (onLoginSuccess) {
-        onLoginSuccess(user);
-      }
-    }, 600);
+    if (!success) {
+      setErrorMsg('NIP/Email atau kata sandi salah. Silakan coba lagi.');
+    } else if (onLoginSuccess) {
+      onLoginSuccess(true);
+    }
   };
 
-  const handleQuickDemoLogin = () => {
+  const handleQuickDemoLogin = async () => {
     setErrorMsg('');
     setInfoMsg('');
-    setNipOrEmail(DEFAULT_TEACHER.nip);
+    setNipOrEmail('198804122015031002');
     setPassword('guru123');
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      login(DEFAULT_TEACHER);
-      if (onLoginSuccess) {
-        onLoginSuccess(DEFAULT_TEACHER);
-      }
-    }, 450);
+    const success = await login('198804122015031002', 'guru123');
+    setIsLoading(false);
+
+    if (!success) {
+      setErrorMsg('Demo login gagal. Pastikan backend berjalan di port 8080.');
+    } else if (onLoginSuccess) {
+      onLoginSuccess(true);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -235,10 +215,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || authLoading}
             className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold text-xs py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 flex items-center justify-center gap-2 transition active:scale-[0.99] disabled:opacity-60 cursor-pointer"
           >
-            {isLoading ? (
+            {(isLoading || authLoading) ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
                 <span>Memverifikasi Akses...</span>
@@ -266,7 +246,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         <button
           type="button"
           onClick={handleQuickDemoLogin}
-          disabled={isLoading}
+          disabled={isLoading || authLoading}
           className="w-full bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-slate-200 hover:text-white font-medium text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer group shadow-sm"
         >
           <Sparkles className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />

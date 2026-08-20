@@ -36,3 +36,15 @@ func (r *PostgresUserRepository) FindByNIPOrEmail(nipOrEmail string) (*domain.Us
 	}
 	return &user, nil
 }
+
+func (r *PostgresUserRepository) GetByID(id string) (*domain.User, error) {
+	var user domain.User
+	err := r.db.First(&user, "id = ?", id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
