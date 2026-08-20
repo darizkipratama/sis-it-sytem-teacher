@@ -24,7 +24,9 @@ export interface TeacherAssignment {
   id: string;
   teacherId: string;
   classId: ClassId;
+  class?: Class;
   subjectId: SubjectId;
+  subject?: Subject;
   dayOfWeek: string;
   startTime: string;
   endTime: string;

@@ -1,26 +1,69 @@
-import React from 'react';
-import { Bell, BookOpen, GraduationCap, ChevronDown, CheckCircle2, CloudLightning, LogOut } from 'lucide-react';
-import { ClassId, UserSession } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Bell, BookOpen, GraduationCap, ChevronDown, CheckCircle2, CloudLightning, LogOut, Loader2 } from 'lucide-react';
+import { UserSession, TeacherAssignment } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { AssignmentService } from '../services/assignmentService';
+import { useAppStore } from '../store/useAppStore';
 
 interface HeaderBarProps {
-  selectedClass: ClassId;
   user?: UserSession | null;
-  onClassChange: (cls: ClassId) => void;
   onOpenIntegrationDrawer: () => void;
   onLogout?: () => void;
 }
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 export const HeaderBar: React.FC<HeaderBarProps> = ({
-  selectedClass,
   user: propUser,
-  onClassChange,
   onOpenIntegrationDrawer,
   onLogout: propOnLogout
 }) => {
   const auth = useAuth();
   const currentUser = propUser || auth.user;
   const handleLogout = propOnLogout || auth.logout;
+
+  const selectedClassId = useAppStore((state) => state.selectedClassId);
+  const selectedAssignment = useAppStore((state) => state.selectedAssignment);
+  const setSelectedAssignment = useAppStore((state) => state.setSelectedAssignment);
+
+  const [classOptions, setClassOptions] = useState<TeacherAssignment[]>([]);
+  const [isLoadingClasses, setIsLoadingClasses] = useState(false);
+
+  const currentDayOfWeek = DAY_NAMES[new Date().getDay()];
+
+  const loadTodayClasses = async () => {
+    if (!currentUser?.id) return;
+
+    setIsLoadingClasses(true);
+    try {
+      const response = await AssignmentService.getAssignmentsByTeacherAndDay(currentUser.id, currentDayOfWeek);
+      if (response.success && response.data && response.data.length > 0) {
+        setClassOptions(response.data);
+      } else {
+        const allResponse = await AssignmentService.getAssignmentsByTeacher(currentUser.id);
+        if (allResponse.success && allResponse.data) {
+          setClassOptions(allResponse.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load class assignments:', err);
+    } finally {
+      setIsLoadingClasses(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTodayClasses();
+  }, [currentUser?.id]);
+
+  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const classId = e.target.value;
+    const assignment = classOptions.find((a) => a.classId === classId) || null;
+    setSelectedAssignment(assignment);
+  };
+
+  const selectedClassName = selectedAssignment?.class?.code || selectedAssignment?.class?.name || selectedClassId;
+
   return (
     <header className="bg-slate-900 text-slate-100 px-4 pt-4 pb-4 shadow-xl relative border-b border-slate-800/80">
       {/* Top Identity Row */}
@@ -80,22 +123,41 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           <BookOpen className="w-4 h-4 text-indigo-400" />
           <span className="text-slate-400 font-medium text-[11px]">Kelas Aktif:</span>
           <div className="relative">
-            <select
-              value={selectedClass}
-              onChange={(e) => onClassChange(e.target.value as ClassId)}
-              className="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs pl-2.5 pr-7 py-1 rounded-xl appearance-none outline-none border border-slate-700 cursor-pointer shadow-sm transition"
-            >
-              <option value="10-IPA-1">10 IPA 1 (Matematika)</option>
-              <option value="10-IPA-2">10 IPA 2 (Matematika)</option>
-              <option value="11-MIPA-3">11 MIPA 3 (Fisika)</option>
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-indigo-400 absolute right-2 top-2 pointer-events-none" />
+            {isLoadingClasses ? (
+              <div className="flex items-center gap-1.5 bg-slate-800 text-slate-400 text-xs pl-2.5 pr-7 py-1 rounded-xl">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                <span>Memuat...</span>
+              </div>
+            ) : (
+              <>
+                <select
+                  value={selectedClassId}
+                  onChange={handleClassChange}
+                  className="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs pl-2.5 pr-7 py-1 rounded-xl appearance-none outline-none border border-slate-700 cursor-pointer shadow-sm transition"
+                >
+                  {classOptions.length === 0 ? (
+                    <option value="">Tidak ada jadwal hari ini</option>
+                  ) : (
+                    classOptions.map((assignment) => {
+                      const classLabel = assignment.class?.code || assignment.class?.name || assignment.classId;
+                      const subjectLabel = assignment.subject?.name || '';
+                      return (
+                        <option key={assignment.id} value={assignment.classId}>
+                          {classLabel}{subjectLabel ? ` - ${subjectLabel}` : ''} ({assignment.startTime}-{assignment.endTime})
+                        </option>
+                      );
+                    })
+                  )}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-indigo-400 absolute right-2 top-2 pointer-events-none" />
+              </>
+            )}
           </div>
         </div>
 
-        {selectedClass === '10-IPA-1' && (
+        {selectedClassId && classOptions.some((a) => a.classId === selectedClassId) && (
           <span className="flex items-center gap-1 bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap">
-            <CheckCircle2 className="w-3 h-3 text-indigo-400" /> Wali Kelas
+            <CheckCircle2 className="w-3 h-3 text-indigo-400" /> Hari Ini
           </span>
         )}
       </div>

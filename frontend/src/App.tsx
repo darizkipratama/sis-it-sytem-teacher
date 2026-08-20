@@ -11,6 +11,7 @@ import {
   getStoredAsyncEvents
 } from './utils/storage';
 import { useAuth } from './context/AuthContext';
+import { useAppStore } from './store/useAppStore';
 
 import { MobileContainer } from './components/MobileContainer';
 import { HeaderBar } from './components/HeaderBar';
@@ -25,7 +26,7 @@ import { LoginForm } from './components/LoginForm';
 
 export default function App() {
   const { user, isAuthenticated, logout } = useAuth();
-  const [selectedClass, setSelectedClass] = useState<ClassId>('10-IPA-1');
+  const selectedClassId = useAppStore((state) => state.selectedClassId);
   const [activeTab, setActiveTab] = useState<NavTab>('sesi');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -52,12 +53,12 @@ export default function App() {
 
   useEffect(() => {
     refreshData();
-  }, [selectedClass, user]);
+  }, [selectedClassId, user]);
 
   // Active Session for selected class
   const fallbackSession: ClassSession = {
     id: 'ses-101',
-    classId: selectedClass,
+    classId: selectedClassId,
     subject: 'Matematika Lanjut',
     room: 'R.204 (Lab Saintek)',
     period: 'Jam 01 - 02 (07.30 - 09.00 WIB)',
@@ -67,12 +68,12 @@ export default function App() {
   };
 
   const activeSession =
-    sessions.find((s) => s.classId === selectedClass) || sessions[0] || fallbackSession;
+    sessions.find((s) => s.classId === selectedClassId) || sessions[0] || fallbackSession;
 
   // Active Syllabus for selected class
   const fallbackSyllabus = {
     id: 'syl-fallback',
-    classId: selectedClass,
+    classId: selectedClassId,
     subjectId: 'subj-1',
     subject: 'Matematika Lanjut',
     gradeLevel: 'Kelas X Semester 2',
@@ -88,10 +89,10 @@ export default function App() {
   };
 
   const activeSyllabus =
-    syllabusList.find((s) => !s.classId || s.classId === selectedClass) || syllabusList[0] || fallbackSyllabus;
+    syllabusList.find((s) => !s.classId || s.classId === selectedClassId) || syllabusList[0] || fallbackSyllabus;
 
   // Filter students for selected class
-  const classStudents = students.filter((s) => s.classId === selectedClass);
+  const classStudents = students.filter((s) => s.classId === selectedClassId);
 
   const handleUpdateSession = (updatedSession: typeof activeSession) => {
     const updated = sessions.map((s) => (s.id === updatedSession.id ? updatedSession : s));
@@ -110,8 +111,7 @@ export default function App() {
         <>
           {/* Top Header */}
           <HeaderBar
-            selectedClass={selectedClass}
-            onClassChange={setSelectedClass}
+            user={user || undefined}
             onOpenIntegrationDrawer={() => setIsDrawerOpen(true)}
           />
 
@@ -119,7 +119,7 @@ export default function App() {
           <main className="flex-1 overflow-y-auto bg-slate-50 min-h-0">
             {activeTab === 'sesi' && (
               <SesiSection
-                selectedClass={selectedClass}
+                selectedClass={selectedClassId}
                 session={activeSession}
                 syllabus={activeSyllabus}
                 onUpdateSession={handleUpdateSession}
@@ -140,7 +140,7 @@ export default function App() {
                 students={classStudents}
                 assessments={assessments}
                 grades={grades}
-                selectedClass={selectedClass}
+                selectedClass={selectedClassId}
                 onRefreshData={refreshData}
               />
             )}
@@ -148,7 +148,7 @@ export default function App() {
             {activeTab === 'pengumuman' && (
               <PengumumanSection
                 announcements={announcements}
-                selectedClass={selectedClass}
+                selectedClass={selectedClassId}
                 totalStudents={classStudents.length}
                 onRefreshData={refreshData}
               />
@@ -158,7 +158,7 @@ export default function App() {
               <JurnalSilabusSection
                 journals={journals}
                 session={activeSession}
-                selectedClass={selectedClass}
+                selectedClass={selectedClassId}
                 onRefreshData={refreshData}
               />
             )}
@@ -179,4 +179,3 @@ export default function App() {
     </MobileContainer>
   );
 }
-

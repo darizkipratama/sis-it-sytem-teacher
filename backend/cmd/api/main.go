@@ -125,6 +125,7 @@ func main() {
 		api.POST("/assignments", assignmentHandler.UpsertAssignment)
 		api.GET("/assignments/current", assignmentHandler.GetCurrentAssignment)
 		api.GET("/assignments/teacher/:teacherId", assignmentHandler.GetAssignmentsByTeacher)
+		api.GET("/assignments/teacher/:teacherId/day/:dayOfWeek", assignmentHandler.GetAssignmentsByTeacherAndDay)
 		api.GET("/assignments/class/:classId", assignmentHandler.GetAssignmentsByClass)
 		api.DELETE("/assignments/:id", assignmentHandler.DeleteAssignment)
 

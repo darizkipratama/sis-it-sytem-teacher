@@ -55,7 +55,13 @@ func (r *PostgresTeacherAssignmentRepository) GetByTeacherAndTime(teacherID, day
 
 func (r *PostgresTeacherAssignmentRepository) GetAllByTeacher(teacherID string) ([]domain.TeacherAssignment, error) {
 	var assignments []domain.TeacherAssignment
-	err := r.db.Where("teacher_id = ?", teacherID).Order("day_of_week ASC, start_time ASC").Find(&assignments).Error
+	err := r.db.Preload("Class").Preload("Subject").Where("teacher_id = ?", teacherID).Order("day_of_week ASC, start_time ASC").Find(&assignments).Error
+	return assignments, err
+}
+
+func (r *PostgresTeacherAssignmentRepository) GetByTeacherAndDay(teacherID, dayOfWeek string) ([]domain.TeacherAssignment, error) {
+	var assignments []domain.TeacherAssignment
+	err := r.db.Preload("Class").Preload("Subject").Where("teacher_id = ? AND day_of_week = ?", teacherID, dayOfWeek).Order("start_time ASC").Find(&assignments).Error
 	return assignments, err
 }
 

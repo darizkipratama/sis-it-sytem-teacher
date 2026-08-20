@@ -75,6 +75,21 @@ func (h *TeacherAssignmentHandler) GetAssignmentsByTeacher(c *gin.Context) {
 	})
 }
 
+func (h *TeacherAssignmentHandler) GetAssignmentsByTeacherAndDay(c *gin.Context) {
+	teacherID := c.Param("teacherId")
+	dayOfWeek := c.Param("dayOfWeek")
+	assignments, err := h.assignmentService.GetByTeacherAndDay(teacherID, dayOfWeek)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    assignments,
+	})
+}
+
 func (h *TeacherAssignmentHandler) GetAssignmentsByClass(c *gin.Context) {
 	classID := c.Param("classId")
 	assignments, err := h.assignmentService.GetByClass(classID)

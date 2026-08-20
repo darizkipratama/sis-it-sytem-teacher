@@ -30,6 +30,10 @@ func (s *TeacherAssignmentService) GetAllByTeacher(teacherID string) ([]domain.T
 	return s.assignmentRepo.GetAllByTeacher(teacherID)
 }
 
+func (s *TeacherAssignmentService) GetByTeacherAndDay(teacherID, dayOfWeek string) ([]domain.TeacherAssignment, error) {
+	return s.assignmentRepo.GetByTeacherAndDay(teacherID, dayOfWeek)
+}
+
 func (s *TeacherAssignmentService) GetByClass(classID string) ([]domain.TeacherAssignment, error) {
 	return s.assignmentRepo.GetByClass(classID)
 }
