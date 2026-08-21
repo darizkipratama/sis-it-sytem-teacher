@@ -119,10 +119,6 @@ export default function App() {
           <main className="flex-1 overflow-y-auto bg-slate-50 min-h-0">
             {activeTab === 'sesi' && (
               <SesiSection
-                selectedClass={selectedClassId}
-                session={activeSession}
-                syllabus={activeSyllabus}
-                onUpdateSession={handleUpdateSession}
                 onNavigateTab={setActiveTab}
               />
             )}

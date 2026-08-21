@@ -1,17 +1,20 @@
 import { BaseService, ServiceResponse } from './baseService';
 import { SyllabusTopic, ClassId } from '../types';
-import { LocalDataSource } from '../data/localDataSource';
 import { EventService } from './eventService';
 
 export class SyllabusService extends BaseService {
   /**
-   * Get syllabus & lesson plans list
+   * Get syllabus & lesson plans list from backend
    */
   public static async getSyllabus(classId?: ClassId): Promise<ServiceResponse<SyllabusTopic[]>> {
     try {
-      const list = await LocalDataSource.getSyllabus();
-      const filtered = classId ? list.filter((s) => !s.classId || s.classId === classId) : list;
-      return this.createSuccess(filtered);
+      const path = classId ? `/syllabus?classId=${encodeURIComponent(classId)}` : '/syllabus';
+      const response = await this.apiClient.get<{ success: boolean; data: SyllabusTopic[] }>(path);
+
+      if (response.success && response.data) {
+        return this.createSuccess(response.data);
+      }
+      return this.createSuccess([]);
     } catch (err) {
       return this.createError('Gagal mengambil daftar rencana ajar', err);
     }
@@ -24,27 +27,20 @@ export class SyllabusService extends BaseService {
     newPlan: Omit<SyllabusTopic, 'id'>
   ): Promise<ServiceResponse<SyllabusTopic>> {
     try {
-      const list = await LocalDataSource.getSyllabus();
-      const planId = `syl-${Date.now()}`;
+      const response = await this.apiClient.post<{ success: boolean; data: SyllabusTopic }>('/syllabus', newPlan);
 
-      const created: SyllabusTopic = {
-        ...newPlan,
-        id: planId,
-        createdAt: new Date().toISOString()
-      };
+      if (response.success && response.data) {
+        await EventService.publishEvent('ihsancloud.syllabus.exchange', 'LESSON_PLAN_CREATED', {
+          id: response.data.id,
+          title: response.data.title,
+          chapter: response.data.chapter,
+          classId: response.data.classId || newPlan.classId,
+          subject: response.data.subject
+        });
 
-      const updated = [created, ...list];
-      await LocalDataSource.saveSyllabus(updated);
-
-      await EventService.publishEvent('ihsancloud.syllabus.exchange', 'LESSON_PLAN_CREATED', {
-        id: created.id,
-        title: created.title,
-        chapter: created.chapter,
-        classId: created.classId || '10-IPA-1',
-        subject: created.subject
-      });
-
-      return this.createSuccess(created, 'Rencana Ajar / Silabus Berhasil Ditambahkan');
+        return this.createSuccess(response.data, 'Rencana Ajar / Silabus Berhasil Ditambahkan');
+      }
+      return this.createError('Gagal menambahkan rencana ajar');
     } catch (err) {
       return this.createError('Gagal menambahkan rencana ajar', err);
     }
@@ -58,25 +54,20 @@ export class SyllabusService extends BaseService {
     subTopicId: string
   ): Promise<ServiceResponse<SyllabusTopic>> {
     try {
-      const list = await LocalDataSource.getSyllabus();
-      const target = list.find((s) => s.id === syllabusId);
-      if (!target) {
-        return this.createError('Silabus tidak ditemukan');
-      }
-
-      target.subTopics = target.subTopics.map((st) =>
-        st.id === subTopicId ? { ...st, completed: !st.completed } : st
+      const response = await this.apiClient.patch<{ success: boolean; data: SyllabusTopic }>(
+        `/syllabus/${syllabusId}/subtopics/${subTopicId}`
       );
 
-      await LocalDataSource.saveSyllabus(list);
+      if (response.success && response.data) {
+        await EventService.publishEvent('ihsancloud.syllabus.exchange', 'SUBTOPIC_TOGGLED', {
+          syllabusId,
+          subTopicId,
+          completed: response.data.subTopics.find((st) => st.id === subTopicId)?.completed
+        });
 
-      await EventService.publishEvent('ihsancloud.syllabus.exchange', 'SUBTOPIC_TOGGLED', {
-        syllabusId,
-        subTopicId,
-        completed: target.subTopics.find((st) => st.id === subTopicId)?.completed
-      });
-
-      return this.createSuccess(target, 'Status sub-topik diperbarui');
+        return this.createSuccess(response.data, 'Status sub-topik diperbarui');
+      }
+      return this.createError('Gagal memperbarui status sub-topik');
     } catch (err) {
       return this.createError('Gagal memperbarui status sub-topik', err);
     }

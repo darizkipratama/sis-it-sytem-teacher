@@ -52,13 +52,19 @@ export class ApiClient {
     return undefined as T;
   }
 
+  private static buildUrl(path: string, isPublic = false): string {
+    const base = API_BASE_URL.replace(/\/$/, '');
+    const prefix = isPublic ? '' : API_PREFIX;
+    return `${base}${prefix}${path}`;
+  }
+
   private static async request<T>(
     method: string,
     path: string,
     body?: any,
     isPublic = false
   ): Promise<T> {
-    const url = `${API_BASE_URL}${isPublic ? '' : API_PREFIX}${path}`;
+    const url = this.buildUrl(path, isPublic);
 
     const fetchPromise = fetch(url, {
       method,

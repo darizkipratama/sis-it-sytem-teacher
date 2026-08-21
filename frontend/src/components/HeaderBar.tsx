@@ -120,7 +120,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
       {/* Class Selector & Wali Kelas Status Pill */}
       <div className="flex items-center justify-between gap-2 bg-slate-950/80 p-2 rounded-2xl border border-slate-800 text-xs">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-indigo-400" />
+          {/* <BookOpen className="w-4 h-4 text-indigo-400" /> */}
           <span className="text-slate-400 font-medium text-[11px]">Kelas Aktif:</span>
           <div className="relative">
             {isLoadingClasses ? (
@@ -143,7 +143,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                       const subjectLabel = assignment.subject?.name || '';
                       return (
                         <option key={assignment.id} value={assignment.classId}>
-                          {classLabel}{subjectLabel ? ` - ${subjectLabel}` : ''} ({assignment.startTime}-{assignment.endTime})
+                          {classLabel}{subjectLabel ? ` - ${subjectLabel}` : ''} ({assignment.dayOfWeek} {assignment.startTime}-{assignment.endTime})
                         </option>
                       );
                     })
@@ -154,12 +154,6 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             )}
           </div>
         </div>
-
-        {selectedClassId && classOptions.some((a) => a.classId === selectedClassId) && (
-          <span className="flex items-center gap-1 bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap">
-            <CheckCircle2 className="w-3 h-3 text-indigo-400" /> Hari Ini
-          </span>
-        )}
       </div>
     </header>
   );

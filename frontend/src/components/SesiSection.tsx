@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Clock,
   Play,
@@ -11,37 +11,70 @@ import {
   UserCheck,
   FileSpreadsheet,
   Zap,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
-import { ClassSession, SyllabusTopic, ClassId } from '../types';
-import { saveJournalEntry, pushAsyncEvent } from '../utils/storage';
+import { SyllabusTopic, ClassId } from '../types';
+import { useAppStore } from '../store/useAppStore';
+import { SyllabusService } from '../services/syllabusService';
+import { JournalService } from '../services/journalService';
+import { pushAsyncEvent } from '../utils/storage';
 
 interface SesiSectionProps {
-  selectedClass: ClassId;
-  session: ClassSession;
-  syllabus: SyllabusTopic;
-  onUpdateSession: (updated: ClassSession) => void;
   onNavigateTab: (tab: any) => void;
 }
 
 export const SesiSection: React.FC<SesiSectionProps> = ({
-  selectedClass,
-  session,
-  syllabus,
-  onUpdateSession,
   onNavigateTab
 }) => {
-  const [sessionStatus, setSessionStatus] = useState<ClassSession['status']>(
-    session?.status || 'Berlangsung'
-  );
-  const [subtopics, setSubtopics] = useState(syllabus?.subTopics || []);
-  const [quickNotes, setQuickNotes] = useState<string>('');
+  const selectedClassId = useAppStore((state) => state.selectedClassId);
+  const selectedAssignment = useAppStore((state) => state.selectedAssignment);
 
-  React.useEffect(() => {
-    if (syllabus?.subTopics) {
-      setSubtopics(syllabus.subTopics);
+  const [sessionStatus, setSessionStatus] = useState<'Belum Dimulai' | 'Berlangsung' | 'Selesai'>('Berlangsung');
+  const [subtopics, setSubtopics] = useState<SyllabusTopic['subTopics']>([]);
+  const [syllabus, setSyllabus] = useState<SyllabusTopic | null>(null);
+  const [latestJournal, setLatestJournal] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const subjectName = selectedAssignment?.subject?.name || 'Matematika Lanjut';
+  const classLabel = selectedAssignment?.class?.code || selectedAssignment?.class?.name || selectedClassId;
+  const startTime = selectedAssignment?.startTime || '07:30';
+  const endTime = selectedAssignment?.endTime || '09:00';
+
+  const loadSesiData = async () => {
+    if (!selectedClassId) return;
+
+    setIsLoading(true);
+    try {
+      const [syllabusRes, journalRes] = await Promise.all([
+        SyllabusService.getSyllabus(selectedClassId),
+        JournalService.getJournals(selectedClassId),
+      ]);
+
+      if (syllabusRes.success && syllabusRes.data && syllabusRes.data.length > 0) {
+        const active = syllabusRes.data.find((s) => !s.classId || s.classId === selectedClassId) || syllabusRes.data[0];
+        setSyllabus(active);
+        setSubtopics(active.subTopics || []);
+      } else {
+        setSyllabus(null);
+        setSubtopics([]);
+      }
+
+      if (journalRes.success && journalRes.data && journalRes.data.length > 0) {
+        setLatestJournal(journalRes.data[0]);
+      } else {
+        setLatestJournal(null);
+      }
+    } catch (err) {
+      console.error('Failed to load sesi data:', err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [syllabus]);
+  };
+
+  useEffect(() => {
+    loadSesiData();
+  }, [selectedClassId]);
 
   const handleToggleSubtopic = (id: string) => {
     const updated = subtopics.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s));
@@ -54,19 +87,12 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
     });
   };
 
-  const handleChangeStatus = (newStatus: ClassSession['status']) => {
+  const handleChangeStatus = (newStatus: 'Belum Dimulai' | 'Berlangsung' | 'Selesai') => {
     setSessionStatus(newStatus);
-    const updated = {
-      ...session,
-      status: newStatus,
-      startTime: newStatus === 'Berlangsung' ? new Date().toLocaleTimeString('id-ID') : session.startTime,
-      endTime: newStatus === 'Selesai' ? new Date().toLocaleTimeString('id-ID') : session.endTime
-    };
-    onUpdateSession(updated);
 
     pushAsyncEvent('ihsancloud.session.exchange', 'CLASS_SESSION_STATUS_CHANGED', {
-      sessionId: session.id,
-      classId: session.classId,
+      sessionId: latestJournal?.id || 'ses-101',
+      classId: selectedClassId,
       newStatus,
       timestamp: new Date().toISOString()
     });
@@ -74,6 +100,21 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
 
   const completedCount = subtopics.filter((s) => s.completed).length;
   const progressPercent = Math.round((completedCount / (subtopics.length || 1)) * 100);
+
+  const period = latestJournal?.period || `Jam ${startTime} - ${endTime}`;
+  const topic = latestJournal?.materialTaught || 'Belum ada materi yang diinput';
+  const room = 'R.204 (Lab Saintek)';
+
+  if (isLoading) {
+    return (
+      <div className="p-4 flex items-center justify-center min-h-[200px]">
+        <div className="flex items-center gap-2 text-slate-500">
+          <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
+          <span className="text-sm font-medium">Memuat data sesi...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 space-y-4 pb-20">
@@ -84,7 +125,7 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
         <div className="flex items-center justify-between mb-3">
           <span className="flex items-center gap-1.5 bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide">
             <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            {session.period}
+            {period}
           </span>
           <span
             className={`px-3 py-0.5 rounded-full text-xs font-bold ${
@@ -100,18 +141,18 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
         </div>
 
         <h2 className="text-lg font-extrabold tracking-tight text-white mb-1">
-          {session.subject} - {session.classId}
+          {subjectName} - {classLabel}
         </h2>
         <p className="text-xs text-slate-400 font-medium mb-3 flex items-center gap-1.5">
           <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-          Ruang: <span className="font-semibold text-slate-200">{session.room}</span>
+          Ruang: <span className="font-semibold text-slate-200">{room}</span>
         </p>
 
         <div className="bg-slate-950/80 backdrop-blur-md rounded-2xl p-3 mb-4 border border-slate-800">
           <p className="text-[11px] text-indigo-400 font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
             <BookOpen className="w-3 h-3" /> Topik Hari Ini
           </p>
-          <p className="text-xs font-bold text-white">{session.topic}</p>
+          <p className="text-xs font-bold text-white">{topic}</p>
         </div>
 
         {/* Start / Finish Session Action Buttons */}
@@ -186,7 +227,7 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
             </div>
             <div>
               <h3 className="text-xs font-bold text-slate-900">Silabus Pengajaran Hari Ini</h3>
-              <p className="text-[10px] text-slate-500">{syllabus?.chapter || 'Bab 1'}</p>
+              <p className="text-[10px] text-slate-500">{syllabus?.chapter || 'Belum ada silabus'}</p>
             </div>
           </div>
           <span className="text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100">
@@ -194,39 +235,45 @@ export const SesiSection: React.FC<SesiSectionProps> = ({
           </span>
         </div>
 
-        <p className="text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 mb-3 italic">
-          "{syllabus?.competencyTarget || 'Capaian Pembelajaran Kurikulum Merdeka'}"
-        </p>
+        {syllabus?.competencyTarget && (
+          <p className="text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 mb-3 italic">
+            "{syllabus.competencyTarget}"
+          </p>
+        )}
 
         {/* Subtopics Checklist */}
         <div className="space-y-2">
           <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Sub-materi Pertemuan:</p>
-          {subtopics.map((st) => (
-            <label
-              key={st.id}
-              onClick={() => handleToggleSubtopic(st.id)}
-              className={`flex items-center justify-between p-2.5 rounded-2xl border transition cursor-pointer ${
-                st.completed
-                  ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950 font-medium'
-                  : 'bg-slate-50 border-slate-200/80 text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="checkbox"
-                  checked={st.completed}
-                  onChange={() => {}}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 accent-indigo-600 cursor-pointer"
-                />
-                <span className={`text-xs ${st.completed ? 'line-through text-indigo-900' : ''}`}>
-                  {st.title}
+          {subtopics.length === 0 ? (
+            <p className="text-xs text-slate-400 italic">Belum ada sub-topik untuk kelas ini.</p>
+          ) : (
+            subtopics.map((st) => (
+              <label
+                key={st.id}
+                onClick={() => handleToggleSubtopic(st.id)}
+                className={`flex items-center justify-between p-2.5 rounded-2xl border transition cursor-pointer ${
+                  st.completed
+                    ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950 font-medium'
+                    : 'bg-slate-50 border-slate-200/80 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <input
+                    type="checkbox"
+                    checked={st.completed}
+                    onChange={() => {}}
+                    className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 accent-indigo-600 cursor-pointer"
+                  />
+                  <span className={`text-xs ${st.completed ? 'line-through text-indigo-900' : ''}`}>
+                    {st.title}
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-mono bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                  {st.recommendedDuration}
                 </span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-mono bg-white px-2 py-0.5 rounded-md border border-slate-200">
-                {st.recommendedDuration}
-              </span>
-            </label>
-          ))}
+              </label>
+            ))
+          )}
         </div>
       </div>
     </div>
